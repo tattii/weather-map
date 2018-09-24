@@ -21,6 +21,9 @@ function parseXML(xml) {
     var property = item.Kind[0].Property[0];
     if (property.Type == '等圧線'){
       collection.push(isobar(property));
+
+    }else if (property.CenterPart){
+      collection.push(disturbance(property));
     }
   }
 }
@@ -36,5 +39,27 @@ function isobar(property) {
     if (d[2]) return [parseFloat(d[2]), parseFloat(d[1])]; // lng, lat
   });
 
-  return turf.lineString(coords, {type: 'isobar', pressure: pressure});
+  return turf.lineString(coords, {type: 'isobar', pressure});
 }
+
+
+
+function disturbance(property) {
+  var type = property.Type[0];
+  var part = property.CenterPart[0];
+
+  var coord = coordinate(part['jmx_eb:Coordinate']);
+  var pressure = parseInt(part['jmx_eb:Pressure'][0]._);
+  var direction = parseInt(part['jmx_eb:Direction'][0]._);
+  var speed = part['jmx_eb:Speed'][0].$.description;
+
+  return turf.point(coord, {type, pressure, direction, speed});
+}
+
+
+function coordinate(jmx) {
+  var d = jmx[0]._.split(/[\/\+]/);
+  return [parseFloat(d[2]), parseFloat(d[1])]; // lng, lat
+}
+
+
