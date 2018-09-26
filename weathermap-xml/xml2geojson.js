@@ -23,11 +23,11 @@ function parseXML(xml) {
 
   for(var item of infos[0].MeteorologicalInfo[0].Item) {
     var property = item.Kind[0].Property[0];
-    console.log(property.Type);
     if (property.Type == '等圧線'){
       collection.push(isobar(property));
     
     }else if (property.Type == '台風'){
+      collection.push(typhoon(item));
 
     }else if (property.CenterPart){ // 低気圧 高気圧
       collection.push(disturbance(property));
@@ -39,7 +39,7 @@ function parseXML(xml) {
     //TODO: 悪天情報
   }
 
-  return turf.featureCollection([collection[0]]);
+  return turf.featureCollection(collection);
 }
 
 
@@ -52,16 +52,60 @@ function isobar(property) {
 }
 
 
-function disturbance(property) {
-  var type = property.Type[0];
-  var part = property.CenterPart[0];
+function typhoon(item) {
+  for (var kind of item.Kind){
+    var property = kind.Property[0];
+    if (property.CenterPart){
+      var {coord, ...center} = centerPart(property.CenterPart[0]);
 
+    }else if (property.WindSpeedPart){
+      var windSpeed = windSpeedPart(property.WindSpeedPart[0]);
+
+    }else if (property.TyphoonNamePart){
+      var name = typhoonNamePart(property.TyphoonNamePart[0]);
+
+    }else if (property.ClassPart){
+      var typhoonClass = classPart(property.ClassPart[0]);
+    }
+  }
+
+  return turf.point(coord, {center, windSpeed, name, typhoonClass});
+}
+
+function centerPart(part) {
   var coord = coordinate(part['jmx_eb:Coordinate']);
   var pressure = parseInt(part['jmx_eb:Pressure'][0]._);
   var direction = parseInt(part['jmx_eb:Direction'][0]._);
-  var speed = part['jmx_eb:Speed'][0].$.description;
+  var speed = part['jmx_eb:Speed'][0]._;
+  var speed_unit = part['jmx_eb:Speed'][0].$.unit;
+  var speed_str = part['jmx_eb:Speed'][0].$.description;
 
-  return turf.point(coord, {type, pressure, direction, speed});
+  return {coord, pressure, direction, speed, speed_unit, speed_str};
+}
+
+function windSpeedPart(part) {
+  var speed = part['jmx_eb:WindSpeed'][0]._;
+  var unit = part['jmx_eb:WindSpeed'][0].$.unit;
+  return {speed, unit};
+}
+
+function typhoonNamePart(part) {
+  var name = part.Name[0];
+  var name_jp = part.NameKana[0];
+  var number = part.Number[0];
+  return {name, name_jp, number};
+}
+
+function classPart(part) {
+  return part['jmx_eb:TyphoonClass'][0]._;
+}
+
+
+function disturbance(property) {
+  var type = property.Type[0];
+  var {coord, ...part} = centerPart(property.CenterPart[0]);
+
+  return turf.point(coord, {type, ...part});
 }
 
 
