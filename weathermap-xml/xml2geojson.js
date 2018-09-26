@@ -132,16 +132,15 @@ function front(property) {
 
 
 function coordinate(jmx) {
-  var d = jmx[0]._.split(/[\/\+]/);
-  return [parseFloat(d[2]), parseFloat(d[1])]; // lng, lat
+  var d = jmx[0]._.split('/')[0];
+  return [parseFloat(d.substr(6, 7)), parseFloat(d.substr(0, 6))]; // lng, lat
 }
 
 function line(jmx) {
   var coords = jmx[0]._.split('/');
   coords.splice(-1);
-  return coords.map(function(elem) {
-    var d = elem.split('+');
-    return [parseFloat(d[2]), parseFloat(d[1])]; // lng, lat
+  return coords.map(function(d) {
+    return [parseFloat(d.substr(6, 7)), parseFloat(d.substr(0, 6))]; // lng, lat
   });
 }
 
