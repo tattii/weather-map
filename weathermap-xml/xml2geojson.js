@@ -8,6 +8,8 @@ var parser = new xml2js.Parser();
 fs.readFile(file, function(err, data) {
   parser.parseString(data, function(err, xml) {
     console.dir(xml);
+    if (xml.Report.Control[0].Status[0] != '通常') return;
+
     var geojson = parseXML(xml);
 
     var filename = file.split('.')[0] + '.geojson';
@@ -17,12 +19,11 @@ fs.readFile(file, function(err, data) {
 
 function parseXML(xml) {
   var infos = xml.Report.Body[0].MeteorologicalInfos;
-  console.dir(infos[0].MeteorologicalInfo[0].DateTime);
-
   var collection = [];
 
   for(var item of infos[0].MeteorologicalInfo[0].Item) {
     var property = item.Kind[0].Property[0];
+
     if (property.Type == '等圧線'){
       collection.push(isobar(property));
     
@@ -39,7 +40,18 @@ function parseXML(xml) {
     //TODO: 悪天情報
   }
 
-  return turf.featureCollection(collection);
+  var geojson = turf.featureCollection(collection);
+  
+  var head = xml.Report.Head[0];
+  var title = head.Title[0]
+  var report_datetime = head.ReportDateTime[0];
+
+  var time = infos[0].MeteorologicalInfo[0].DateTime[0];
+  var datetime = time._;
+  var datetime_type = time.$.type;
+  
+  geojson.meta = {title, report_datetime, datetime, datetime_type};
+  return geojson;
 }
 
 
