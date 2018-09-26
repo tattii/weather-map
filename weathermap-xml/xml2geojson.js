@@ -133,16 +133,21 @@ function front(property) {
 
 function coordinate(jmx) {
   var d = jmx[0]._.split('/')[0];
-  return [parseFloat(d.substr(6, 7)), parseFloat(d.substr(0, 6))]; // lng, lat
+  return parseCoord(d);
 }
 
 function line(jmx) {
   var coords = jmx[0]._.split('/');
   coords.splice(-1);
   return coords.map(function(d) {
-    return [parseFloat(d.substr(6, 7)), parseFloat(d.substr(0, 6))]; // lng, lat
+    return parseCoord(d);
   });
 }
 
-
+function parseCoord(d) {
+  var lat = parseFloat(d.substr(0, 6));
+  var lng = parseFloat(d.substr(6, 7));
+  if (lng < 0) lng += 360;
+  return [lng, lat];
+}
 
