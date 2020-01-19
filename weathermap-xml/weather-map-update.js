@@ -6,6 +6,8 @@ const {PubSub} = require('@google-cloud/pubsub');
 const {Storage} = require('@google-cloud/storage');
 const projectId = 'weatherbox-217409';
 const bucketName = 'weather-map';
+const bucketUrl = 'https://storage.googleapis.com/weather-map/';
+const indexJSON = 'weather-map.json';
 
 const xml2geojson = require('./xml2geojson');
 
@@ -14,7 +16,7 @@ exports.handler = (event, context) => {
   const pubsubMessage = event.data;
   const message = JSON.parse(Buffer.from(pubsubMessage, 'base64').toString());
   console.log(message);
-  process(message.url);
+  processXML(message.url);
 };
 
 if (require.main === module) {
@@ -33,6 +35,8 @@ function processXML(url) {
       const filename = getFilename(geojson.meta);
       console.log(filename, geojson);
       uploadPublic(filename, geojson);
+
+      updateIndexJSON(geojson.meta, filename);
     });
   });
 }
@@ -48,22 +52,52 @@ function getFilename(meta) {
 }
 
 
-
 // weather-map.json
 // {
-//   current: {
-//     file: "*.geojson",
-//     datetime: ""
-//   },
-//   forecast: {
-//     24h: { file, datetime },
-//     48h: { file, datetime }
-//   },
-//   past: [
-//     { file, datetime },
-//     ...
+//   analysis: [
+//     { url, datetime },
+//     ... (3 days)
 //   ],
+//   forecast: {
+//     24h: { url, datetime },
+//     48h: { url, datetime }
+//   }
 // }
+
+async function updateIndexJSON(meta, filename) {
+  const index = await getJSON(indexJSON);
+
+  const file = {
+    url: bucketUrl + filename,
+    datetime: meta.datetime
+  };
+  if (!index.forecast) index.forecast = {};
+
+  if (meta.title == '地上実況図') {
+    let analysis = index.analysis || [];
+    analysis.unshift(file);
+    index.analysis = analysis.slice(0, 7 * 3); // 7/day * 3days
+
+  } else if (meta.title == '地上２４時間予想図') {
+    index.forecast['24h'] = file;
+
+  } else if (meta.title == '地上４８時間予想図') {
+    index.forecast['48h'] = file;
+  }
+
+  console.log(index);
+  uploadPublic(indexJSON, index);
+}
+
+async function getJSON(filename) {
+  const storage = new Storage({ projectId });
+  const file = await storage.bucket(bucketName).file(filename);
+  const exists = await file.exists();
+  if (!exists[0]) return {};
+
+  const data = await file.download();
+  return JSON.parse(data);
+}
 
 async function uploadPublic(filename, data) {
   const storage = new Storage({ projectId });
