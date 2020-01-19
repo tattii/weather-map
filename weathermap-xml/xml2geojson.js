@@ -2,20 +2,27 @@ var fs = require('fs');
 var xml2js = require('xml2js');
 var turf = require('turf');
 
-var file = process.argv[2];
 
-var parser = new xml2js.Parser();
-fs.readFile(file, function(err, data) {
-  parser.parseString(data, function(err, xml) {
-    console.dir(xml);
-    if (xml.Report.Control[0].Status[0] != '通常') return;
 
-    var geojson = parseXML(xml);
+if (require.main === module) {
+  var file = process.argv[2];
+  processFile(file);
+}
 
-    var filename = file.split('.')[0] + '.geojson';
-    fs.writeFileSync(filename, JSON.stringify(geojson));
+function processFile(file) {
+  var parser = new xml2js.Parser();
+  fs.readFile(file, function(err, data) {
+    parser.parseString(data, function(err, xml) {
+      console.dir(xml);
+      if (xml.Report.Control[0].Status[0] != '通常') return;
+
+      var geojson = parseXML(xml);
+
+      var filename = file.split('.')[0] + '.geojson';
+      fs.writeFileSync(filename, JSON.stringify(geojson));
+    });
   });
-});
+}
 
 function parseXML(xml) {
   var infos = xml.Report.Body[0].MeteorologicalInfos;
