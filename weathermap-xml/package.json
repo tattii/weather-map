@@ -2,7 +2,7 @@
   "name": "weathermap-xml",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "weather-map-update.js",
   "dependencies": {
     "@google-cloud/pubsub": "^1.3.0",
     "@google-cloud/storage": "^4.2.0",
