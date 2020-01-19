@@ -158,3 +158,8 @@ function parseCoord(d) {
   return [lng, lat];
 }
 
+
+module.exports = {
+  parseXML
+};
+
