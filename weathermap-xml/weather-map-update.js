@@ -1,4 +1,4 @@
-const request = require('request');
+const rp = require('request-promise');
 const xml2js = require('xml2js');
 const moment = require('moment');
 
@@ -11,11 +11,11 @@ const indexJSON = 'weather-map.json';
 const xml2geojson = require('./xml2geojson');
 
 
-exports.handler = (event, context) => {
+exports.handler = async (event, context) => {
   const pubsubMessage = event.data;
   const message = JSON.parse(Buffer.from(pubsubMessage, 'base64').toString());
   console.log(message);
-  processXML(message.url);
+  await processXML(message.url);
 };
 
 if (require.main === module) {
@@ -23,22 +23,30 @@ if (require.main === module) {
   processXML(url);
 }
 
-function processXML(url) {
-  request(url, (err, res, data) => {
+async function processXML(url) {
+  const data = await rp(url);
+  const xml = await parseXML(data);
     
+  if (xml.Report.Control[0].Status[0] != '通常') return;
+
+  const geojson = xml2geojson.parseXML(xml);
+  const filename = getFilename(geojson.meta);
+  console.log(filename, geojson);
+  await uploadPublic(filename, geojson);
+
+  await updateIndexJSON(geojson.meta, filename);
+}
+
+function parseXML(data) {
+  return new Promise(function (resolve, reject) {
     const parser = new xml2js.Parser();
-    parser.parseString(data, async (err, xml) => {
-      if (xml.Report.Control[0].Status[0] != '通常') return;
-
-      const geojson = xml2geojson.parseXML(xml);
-      const filename = getFilename(geojson.meta);
-      console.log(filename, geojson);
-      await uploadPublic(filename, geojson);
-
-      await updateIndexJSON(geojson.meta, filename);
+    parser.parseString(data, (err, xml) => {
+      if (err) reject(err);
+      resolve(xml);
     });
   });
 }
+
 
 function getFilename(meta) {
   const datetime = moment(meta.datetime).format('YYYYMMDDHHmm');
