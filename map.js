@@ -3,7 +3,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidGF0dGlpIiwiYSI6ImNqMWFrZ3ZncjAwNmQzM3BmazRtN
 var map = new mapboxgl.Map({
   container: 'map',
   //style: 'mapbox://styles/tattii/cj8fozpkv0jn22rnwn6h65hvc',
-  style: 'mapbox://styles/tattii/cj1bob6hw003t2rr5s2svi3iq',
+  style: 'mapbox://styles/tattii/ck5v2rl5713lo1iqis2h1uhu8',
   zoom: 4.2,
   center: [136.6, 35.5],
   attributionControl: false,
@@ -13,42 +13,7 @@ var map = new mapboxgl.Map({
 });
 
 map.on('load', async function() {
-  const url = 'https://storage.googleapis.com/weather-map/analysis/202001260900.geojson';
-  const res = await fetch(url, { mode: 'cors' });
-  const geojson = await res.json();
-  console.log(geojson);
-  map.addSource('weathermap', {
-    type: 'geojson',
-    data: geojson
-    //data: 'weathermap-xml/da0ee85d-30e2-3357-9e6c-edcae1dd1280.geojson'
-  });
-
-  map.addLayer({
-    "id": "isobar",
-    "type": "line",
-    "source": "weathermap",
-    "paint": {
-      "line-color": "#ccc",
-    },
-    "filter": ["==", "type", "isobar"]
-  });
-  
-  map.addLayer({
-    "id": "cold-front",
-    "type": "line",
-    "source": "weathermap",
-    "paint": {
-      //"line-pattern": "Cold_front_symbol",
-      "line-width": 40
-    },
-    "filter": ["in", "type", "寒冷前線", "温暖前線", "停滞前線", "閉塞前線"]
-  });
-  
-  map.addLayer({
-    "id": "symbol",
-    "type": "symbol",
-    "source": "weathermap",
-    "paint": {}
-  });
+  const weathermap = new WeatherMap(map); 
 });
+
 
