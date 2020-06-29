@@ -9,7 +9,8 @@ class WeatherMap {
     const res = await fetch(this.indexJson, { mode: 'cors' });
     this.index = await res.json();
     console.log(this.index);
-    this.addLayer(this.index.analysis[0].url);
+    this.addLayer('https://storage.googleapis.com/weather-map/analysis/202006280000.geojson');
+    //this.addLayer(this.index.analysis[0].url);
   }
 
   async addLayer(url) {
@@ -43,27 +44,20 @@ class WeatherMap {
         "line-color": [
           "match",
           ["get", "type"],
-          "寒冷前線", "blue",
-          "温暖前線", "red",
-          "停滞前線", "purple",
-          "閉塞前線", "purple",
+          "寒冷前線", "#1437B1",
+          "温暖前線", "#7A1C1C",
+          "停滞前線", "#39144C",
+          "閉塞前線", "#39144C",
           /* default */ "#000"
         ]
       },
       "filter": ["in", "type", "寒冷前線", "温暖前線", "停滞前線", "閉塞前線"]
     });
     
-    this.map.addLayer({
-      "id": "front-symbol",
-      "type": "line",
-      "source": "weathermap",
-      "paint": {
-        "line-pattern": "triangle-15",
-        "line-offset": 5,
-        "line-width": 20
-      },
-      "filter": ["in", "type", "寒冷前線", "温暖前線", "停滞前線", "閉塞前線"]
-    });
+    this.addFront('cold', '寒冷前線', 8, 15);
+    this.addFront('warm', '温暖前線', -5, 12);
+    this.addFront('stationary', '停滞前線', 2, 26);
+    this.addFront('occuluded', '閉塞前線', -5, 12);
 
     this.map.addLayer({
       "id": "symbol",
@@ -71,6 +65,22 @@ class WeatherMap {
       "source": "weathermap",
       "paint": {}
     });
+  }
+
+  addFront(id, type, offset, width) {
+    console.log(id);
+    this.map.addLayer({
+      "id": "front-symbol-" + id,
+      "type": "line",
+      "source": "weathermap",
+      "paint": {
+        "line-pattern": "front-" + id,
+        "line-offset": offset,
+        "line-width": width
+      },
+      "filter": ["==", "type", type]
+    });
+
   }
 }
 

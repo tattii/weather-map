@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="96px" height="16px" viewBox="0 0 96 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>front-occuluded</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M95.9667969,13.0561523 L66.7138576,14 C66.7138576,8.4772 62.260557,4 56.7672378,4 C51.2739186,4 46.820618,8.4772 46.820618,14 L36.8739982,0 L26.9273784,14 L0,14 L0,16 L95.9667969,16 L95.9667969,13.0561523 Z" id="front-occuluded" fill="#39144C" transform="translate(47.983398, 8.000000) scale(1, -1) translate(-47.983398, -8.000000) "></path>
+    </g>
+</svg>
