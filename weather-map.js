@@ -1,7 +1,11 @@
 class WeatherMap {
   constructor(map) {
     this.map = map;
-    this.indexJson = 'https://storage.googleapis.com/weather-map/weather-map.json'
+    this.indexJson = 'https://storage.googleapis.com/weather-map/weather-map.json';
+    this.style = {
+      isobar: '#ccc'
+    };
+
     this._add();
   }
 
@@ -16,8 +20,8 @@ class WeatherMap {
   async addLayer(url) {
     const res = await fetch(url, { mode: 'cors' });
     const geojson = await res.json();
-    console.log(geojson);
-  const satellite = new Satellite(this.map);
+    //console.log(geojson);
+    const satellite = new Satellite(this.map);
 
     this.map.addSource('weathermap', {
       type: 'geojson',
@@ -35,6 +39,7 @@ class WeatherMap {
       "filter": ["==", "type", "isobar"]
     });
     
+    this.front = new WeatherMapFront(this.map, geojson);
     this.map.addLayer({
       "id": "front",
       "type": "line",
@@ -54,10 +59,6 @@ class WeatherMap {
       "filter": ["in", "type", "寒冷前線", "温暖前線", "停滞前線", "閉塞前線"]
     });
     
-    this.addFront('cold', '寒冷前線', 8, 15);
-    this.addFront('warm', '温暖前線', -5, 12);
-    this.addFront('stationary', '停滞前線', 2, 26);
-    this.addFront('occuluded', '閉塞前線', -5, 12);
 
     this.map.addLayer({
       "id": "symbol",
@@ -65,22 +66,6 @@ class WeatherMap {
       "source": "weathermap",
       "paint": {}
     });
-  }
-
-  addFront(id, type, offset, width) {
-    console.log(id);
-    this.map.addLayer({
-      "id": "front-symbol-" + id,
-      "type": "line",
-      "source": "weathermap",
-      "paint": {
-        "line-pattern": "front-" + id,
-        "line-offset": offset,
-        "line-width": width
-      },
-      "filter": ["==", "type", type]
-    });
-
   }
 }
 

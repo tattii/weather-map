@@ -2,7 +2,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidGF0dGlpIiwiYSI6ImNqMWFrZ3ZncjAwNmQzM3BmazRtN
 
 var map = new mapboxgl.Map({
   container: 'map',
-  style: 'mapbox://styles/tattii/ckc04f8i51bcx1irrcme7stbj',
+  style: 'mapbox://styles/tattii/ckc0b6ks64uks1io9nljrkbhs',
   zoom: 4.2,
   center: [136.6, 35.5],
   attributionControl: false,
