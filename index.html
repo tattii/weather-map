@@ -4,7 +4,7 @@
 	<meta charset=utf-8 />
 	<title>Weathermap</title>
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-	<link rel='stylesheet' href='//api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css' />
+	<link rel='stylesheet' href='//api.tiles.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css' />
 	<link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css' />
 	<style>
 		body { margin:0; padding:0; }
@@ -14,11 +14,12 @@
 <body>
 	<div id='map'></div>
 
-
-    <script src='//api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'></script>
+	<script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script>
+    <script src='//api.tiles.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js'></script>
 	<script src='//code.jquery.com/jquery-3.1.1.min.js'></script>
 	<script src='//cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js'></script>
 
+	<script src="weather-map-front.js"></script>
 	<script src="weather-map.js"></script>
 	<script src="satellite.js"></script>
 	<script src="map.js"></script>
