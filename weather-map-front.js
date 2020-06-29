@@ -6,11 +6,9 @@ class WeatherMapFront {
 
   add(geojson) {
     const front = geojson.features.filter(f => f.properties.type.includes('前線'));
-    console.log(front);
     const split = front.reduce((features, f) => {
       return features.concat(this.split(f).features);
     }, []);
-    console.log(split);
     
     this.map.addSource('weathermap-front', {
       type: 'geojson',
@@ -21,11 +19,13 @@ class WeatherMapFront {
 
   split(f) {
     const length = turf.length(f);
-    console.log(f.properties, length);
-    if (length < 200) f.properties.z = 10;
-    const chunks = turf.lineChunk(f, 360);
+    const segment = f.properties.type === '停滞前線' ? 450 : 360; // km
+    const chunks = turf.lineChunk(f, segment);
     for (let i in chunks.features) {
-      chunks.features[i].properties = f.properties;
+      chunks.features[i].properties = Object.assign({}, f.properties);
+      if (turf.length(chunks.features[i]) < 100) {
+        chunks.features[i].properties.z = 10;
+      }
     }
     return chunks;
   }
@@ -45,14 +45,22 @@ class WeatherMapFront {
       "minzoom": 3.8,
       "layout": {
         "icon-image": "front2-" + id,
-        "icon-size": 1.0,
+        "icon-size": [
+          'interpolate',
+          ['exponential', 1.0],
+          ['zoom'],
+          4, 0.8,
+          8, 1.6
+        ],
         "symbol-placement": "line-center",
         "symbol-spacing": 100,
         "icon-offset": [0, offset],
         "icon-rotate": 180,
       },
-      "filter": ["==", "type", type]
+      "filter": ["all",
+        ["==", "type", type],
+        ["!=", "z", 10]
+      ]
     });
-
   }
 }

@@ -2,10 +2,6 @@ class WeatherMap {
   constructor(map) {
     this.map = map;
     this.indexJson = 'https://storage.googleapis.com/weather-map/weather-map.json';
-    this.style = {
-      isobar: '#ccc'
-    };
-
     this._add();
   }
 
@@ -13,8 +9,8 @@ class WeatherMap {
     const res = await fetch(this.indexJson, { mode: 'cors' });
     this.index = await res.json();
     console.log(this.index);
-    this.addLayer('https://storage.googleapis.com/weather-map/analysis/202006280000.geojson');
-    //this.addLayer(this.index.analysis[0].url);
+    //this.addLayer('https://storage.googleapis.com/weather-map/analysis/202006280000.geojson');
+    this.addLayer(this.index.analysis[0].url);
   }
 
   async addLayer(url) {
