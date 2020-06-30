@@ -59,14 +59,8 @@ class WeatherMap {
       },
       "filter": ["in", "type", "寒冷前線", "温暖前線", "停滞前線", "閉塞前線"]
     });
-    
-
-    this.map.addLayer({
-      "id": "symbol",
-      "type": "symbol",
-      "source": "weathermap",
-      "paint": {}
-    });
+   
+   this.addSymbols();
   }
 
   addIsobar(type, width, dash) {
@@ -87,5 +81,64 @@ class WeatherMap {
       ]
     });
   }
+  
+  addSymbols() {
+    this.map.addLayer({
+      "id": "symbol",
+      "type": "symbol",
+      "source": "weathermap",
+      "layout": {
+        "icon-image": "center",
+        "icon-size": 0.6,
+        "icon-allow-overlap": true
+      },
+      "paint": {
+        "icon-opacity": 0.7
+      },
+      filter: ["in", "type", "低気圧", "高気圧", "熱帯低気圧", "台風"]
+    });
+    
+    this.map.addLayer({
+      "id": "symbol-pressure",
+      "type": "symbol",
+      "source": "weathermap",
+      "minzoom": 3.0,
+      "layout": {
+        "text-field": "{pressure}",
+        "text-size": 12,
+        "text-font": ["DIN Pro Regular"],
+        "text-offset": [0, 1.4]
+      },
+      "paint": {
+        "text-color": "rgba(255, 255, 255, 0.8)"
+      },
+      filter: ["in", "type", "低気圧", "高気圧", "熱帯低気圧"]
+    });
+
+    this.addLabel('低気圧', 'L', '#7A1C1C');
+    this.addLabel('高気圧', 'H', '#1437B1');
+    this.addLabel('熱帯低気圧', 'TD', '#7A1C1C');
+  }
+
+  addLabel(type, label, color) {
+    this.map.addLayer({
+      "id": "symbol-" + label,
+      "type": "symbol",
+      "source": "weathermap",
+      "layout": {
+        "text-field": label,
+        "text-size": 20,
+        "text-font": ["DIN Pro Bold"],
+        "text-offset": [0, -1.0]
+      },
+      "paint": {
+        "text-color": color,
+        "text-halo-color": "rgba(255, 255, 255, 0.4)",
+        "text-halo-width": 1
+      },
+      filter: ["==", "type", type]
+    });
+  }
+
 }
 

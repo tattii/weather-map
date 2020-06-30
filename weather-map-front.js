@@ -42,14 +42,14 @@ class WeatherMapFront {
       "id": "front-symbol-" + id,
       "type": "symbol",
       "source": "weathermap-front",
-      "minzoom": 3.5,
+      "minzoom": 3.0,
       "layout": {
         "icon-image": "front2-" + id,
         "icon-size": [
           'interpolate',
           ['exponential', 1.0],
           ['zoom'],
-          4, 0.8,
+          3, 0.6,
           8, 1.6
         ],
         "symbol-placement": "line-center",
