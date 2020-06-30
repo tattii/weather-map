@@ -31,7 +31,7 @@ class Satellite {
       "paint": {
         "raster-opacity": 0.3
       }
-    }, "isobar");
+    }, "isobar-2hPa");
   }
   
   addLayerJP(d) {

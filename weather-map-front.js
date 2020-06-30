@@ -42,7 +42,7 @@ class WeatherMapFront {
       "id": "front-symbol-" + id,
       "type": "symbol",
       "source": "weathermap-front",
-      "minzoom": 3.8,
+      "minzoom": 3.5,
       "layout": {
         "icon-image": "front2-" + id,
         "icon-size": [

@@ -19,21 +19,26 @@ class WeatherMap {
     //console.log(geojson);
     const satellite = new Satellite(this.map);
 
+    geojson.features.forEach((f, i) => {
+      if (f.properties.type === 'isobar') {
+        if (f.properties.pressure % 20 === 0) {
+          geojson.features[i].properties.isobar = '20hPa';
+        } else if (f.properties.pressure % 4 === 0) {
+          geojson.features[i].properties.isobar = '4hPa';
+        } else if (f.properties.pressure % 2 === 0) {
+          geojson.features[i].properties.isobar = '2hPa';
+        }
+      }
+    });
     this.map.addSource('weathermap', {
       type: 'geojson',
       data: geojson
     });
 
-    this.map.addLayer({
-      "id": "isobar",
-      "type": "line",
-      "source": "weathermap",
-      "paint": {
-        "line-color": "#ccc",
-        "line-opacity": 0.7
-      },
-      "filter": ["==", "type", "isobar"]
-    });
+    this.addIsobar('2hPa', 0.75, [10, 5]);
+    this.addIsobar('4hPa', 0.75);
+    this.addIsobar('20hPa', 1.5);
+
     
     this.front = new WeatherMapFront(this.map, geojson);
     this.map.addLayer({
@@ -61,6 +66,25 @@ class WeatherMap {
       "type": "symbol",
       "source": "weathermap",
       "paint": {}
+    });
+  }
+
+  addIsobar(type, width, dash) {
+    const paint = {
+      "line-color": "#ccc",
+      "line-opacity": 0.3,
+      "line-width": width
+    };
+    if (dash) paint['line-dasharray'] = dash;
+    this.map.addLayer({
+      "id": "isobar-" + type,
+      "type": "line",
+      "source": "weathermap",
+      "paint": paint,
+      "filter": ["all",
+        ["==", "type", "isobar"],
+        ["==", "isobar", type]
+      ]
     });
   }
 }
