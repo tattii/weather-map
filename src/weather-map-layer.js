@@ -1,23 +1,41 @@
-class WeatherMap {
-  constructor(map) {
+import mapboxgl from 'mapbox-gl';
+
+import WeatherMapFront from './weather-map-front';
+
+export default class WeatherMapLayer {
+  constructor(map, data, onSelected) {
     this.map = map;
-    this.indexJson = 'https://storage.googleapis.com/weather-map/weather-map.json';
-    this._add();
+    this.data = data;
+    this.onSelected = onSelected;
+    this.layerId = 'weather-map';
+
+    this.addMap();
   }
 
-  async _add() {
-    const res = await fetch(this.indexJson, { mode: 'cors' });
-    this.index = await res.json();
-    console.log(this.index);
+  addMap() {
+    this.render();
+    this.addLayer(this.data.analysis[0].url);
     //this.addLayer('https://storage.googleapis.com/weather-map/analysis/202006280000.geojson');
-    this.addLayer(this.index.analysis[0].url);
+
+    this.popup = new mapboxgl.Popup({
+      closeButton: false
+    });
+    this.map.on('mousemove', this.hover);
   }
 
+  remove() {
+    this.map.removeLayer(this.layerId);
+    this.map.off('mousemove', this.hover);
+    this.popup.remove();
+  }
+
+  render() {
+  }
+  
   async addLayer(url) {
     const res = await fetch(url, { mode: 'cors' });
     const geojson = await res.json();
     //console.log(geojson);
-    const satellite = new Satellite(this.map);
 
     geojson.features.forEach((f, i) => {
       if (f.properties.type === 'isobar') {
@@ -140,5 +158,23 @@ class WeatherMap {
     });
   }
 
-}
 
+  hover = (e) => {
+    const features = this.map.queryRenderedFeatures(e.point, { layers: [this.layerId] });
+    this.map.getCanvas().style.cursor = (features.length) ? 'crosshair' : '';
+
+    let html;
+    if (features.length) {
+      const code = features[0].properties.code;
+      html = code;
+    }
+    
+    if (html) {
+      this.popup.setLngLat(e.lngLat)
+        .setHTML(html)
+        .addTo(this.map);
+    } else {
+      this.popup.remove();
+    }
+  }
+}

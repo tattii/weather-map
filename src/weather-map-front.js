@@ -1,4 +1,6 @@
-class WeatherMapFront {
+import * as turf from '@turf/turf';
+
+export default class WeatherMapFront {
   constructor(map, geojson) {
     this.map = map;
     this.add(geojson);
@@ -18,7 +20,6 @@ class WeatherMapFront {
   }
 
   split(f) {
-    const length = turf.length(f);
     const segment = f.properties.type === '停滞前線' ? 450 : 360; // km
     const chunks = turf.lineChunk(f, segment);
     for (let i in chunks.features) {

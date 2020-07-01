@@ -1,4 +1,4 @@
-class Satellite {
+export default class Satellite {
   constructor(map) {
     this.map = map;
     this.add();
@@ -36,7 +36,7 @@ class Satellite {
   
   addLayerJP(d) {
     const url = 'https://www.data.jma.go.jp/tile/satprod/' + d.basetime + '/JP/' + d.validtime + '/B13/TBB/{z}/{x}/{y}.png';
-    map.addSource('satellite', {
+    this.map.addSource('satellite', {
       type: 'raster',
       tiles: [url],
       minzoom: 3,
