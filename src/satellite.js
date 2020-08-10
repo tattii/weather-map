@@ -9,7 +9,7 @@ export default class Satellite {
       .then(res => { console.log(res); return res.json(); })
       .then(data => {
         this.index = data;
-        this.addLayer(data[0]);
+        this.addLayer(data[data.length - 1]);
       });
   }
 

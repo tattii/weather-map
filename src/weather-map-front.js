@@ -7,7 +7,7 @@ export default class WeatherMapFront {
   }
 
   add(geojson) {
-    const front = geojson.features.filter(f => f.properties.type.includes('前線'));
+    const front = geojson.features.filter(f => f.properties.type && f.properties.type.includes('前線'));
     const split = front.reduce((features, f) => {
       return features.concat(this.split(f).features);
     }, []);

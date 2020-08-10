@@ -1,6 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 
 import WeatherMapFront from './weather-map-front';
+import Satellite from './satellite';
 
 export default class WeatherMapLayer {
   constructor(map, data, onSelected) {
@@ -78,7 +79,9 @@ export default class WeatherMapLayer {
       "filter": ["in", "type", "寒冷前線", "温暖前線", "停滞前線", "閉塞前線"]
     });
    
-   this.addSymbols();
+    this.addSymbols();
+    
+    this.satellit = new Satellite(this.map);
   }
 
   addIsobar(type, width, dash) {

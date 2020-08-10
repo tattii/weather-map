@@ -1,7 +1,6 @@
 import { Component } from 'react';
 
 import WeatherMapLayer from './weather-map-layer';
-import Satellite from './satellite';
 
 const url = 'https://storage.googleapis.com/weather-map/weather-map.json';
 
@@ -39,7 +38,6 @@ export default class Warning extends Component {
   addLayer() {
     if (!this.map || !this.data) return;
     this.layer = new WeatherMapLayer(this.map, this.data, this.onSelected);
-    this.satellit = new Satellite(this.map);
   }
 
   render() {
