@@ -21,7 +21,7 @@ export default class WeatherMapLayer {
     this.popup = new mapboxgl.Popup({
       closeButton: false
     });
-    this.map.on('mousemove', this.hover);
+    //this.map.on('mousemove', this.hover);
   }
 
   remove() {
@@ -80,6 +80,7 @@ export default class WeatherMapLayer {
     });
    
     this.addSymbols();
+    this.addTyphoons(geojson);
     
     this.satellit = new Satellite(this.map);
   }
@@ -116,7 +117,7 @@ export default class WeatherMapLayer {
       "paint": {
         "icon-opacity": 0.7
       },
-      filter: ["in", "type", "低気圧", "高気圧", "熱帯低気圧", "台風"]
+      filter: ["in", "type", "低気圧", "高気圧", "熱帯低気圧"]
     });
     
     this.map.addLayer({
@@ -158,6 +159,54 @@ export default class WeatherMapLayer {
         "text-halo-width": 1
       },
       filter: ["==", "type", type]
+    });
+  }
+
+  addTyphoons(geojson) {
+    const typhoon = geojson.features.filter(f => 'typhoonClass' in f.properties)
+      .map(f => {
+        f.properties.pressure = f.properties.center.pressure;
+        f.properties.name = '台' + parseInt(f.properties.name.number.substr(2)) + '号';
+        return f;
+      });
+    this.map.addSource('weathermap-ty', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: typhoon }
+    });
+
+    this.map.addLayer({
+      "id": "symbol-ty-pressure",
+      "type": "symbol",
+      "source": "weathermap-ty",
+      "minzoom": 3.0,
+      "layout": {
+        "text-field": "{pressure}",
+        "text-allow-overlap": true,
+        "text-size": 12,
+        "text-font": ["DIN Pro Regular"],
+        "text-offset": [-1.6, 2.2]
+      },
+      "paint": {
+        "text-color": "rgba(255, 255, 255, 0.8)"
+      },
+    });
+    this.map.addLayer({
+      "id": "symbol-ty",
+      "type": "symbol",
+      "source": "weathermap-ty",
+      "layout": {
+        "icon-image": "center",
+        "icon-size": 0.6,
+        "icon-allow-overlap": true,
+        "text-field": "{name}",
+        "text-size": 12,
+        "text-font": ["Noto Sans CJK JP Regular"],
+        "text-offset": [-1.5, 1]
+      },
+      "paint": {
+        "icon-opacity": 0.7,
+        "text-color": "rgba(255, 255, 255, 0.8)"
+      },
     });
   }
 
