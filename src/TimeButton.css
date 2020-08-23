@@ -1,0 +1,18 @@
+.time-button {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	z-index: 100;
+}
+
+.time-button .inverted.ui.button {
+	margin-left: 0px;
+	box-shadow: 0 0 0 0px #ccc inset!important;
+	background: rgba(0, 0, 0, 0.5);
+	opacity: 1!important;
+}
+
+.time-button .inverted.ui.button:hover,
+.time-button .inverted.ui.button.active {
+	color: #fff;
+}

@@ -1,6 +1,7 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 
 import WeatherMapLayer from './weather-map-layer';
+import TimeButton from './TimeButton';
 
 const url = 'https://storage.googleapis.com/weather-map/weather-map.json';
 
@@ -37,10 +38,14 @@ export default class Warning extends Component {
 
   addLayer() {
     if (!this.map || !this.data) return;
-    this.layer = new WeatherMapLayer(this.map, this.data, this.onSelected);
+    this.layer = new WeatherMapLayer(this.map, this.data);
   }
 
   render() {
-    return null;
+    return <TimeButton data={this.state.data} />;
+  }
+
+  selectTime = (type, index) => {
+    console.log(type, index);
   }
 }
