@@ -4,17 +4,16 @@ import WeatherMapFront from './weather-map-front';
 import Satellite from './satellite';
 
 export default class WeatherMapLayer {
-  constructor(map, data, onSelected) {
+  constructor(map, data) {
     this.map = map;
     this.data = data;
-    this.onSelected = onSelected;
     this.layerId = 'weather-map';
+    this.sourceId = 'weathermap';
 
     this.addMap();
   }
 
   addMap() {
-    this.render();
     this.addLayer(this.data.analysis[0].url);
     //this.addLayer('https://storage.googleapis.com/weather-map/analysis/202006280000.geojson');
 
@@ -30,13 +29,34 @@ export default class WeatherMapLayer {
     this.popup.remove();
   }
 
-  render() {
+  set(datetime, url, type) {
+    this.addLayer(url);
+
+    // satellite
   }
   
   async addLayer(url) {
+    const geojson = await this.fetchGeojson(url);
+
+    const source = this.map.getSource(this.sourceId);
+    if (!source) {
+      this.map.addSource(this.sourceId, {
+        type: 'geojson',
+        data: geojson
+      });
+      this.addLayers(geojson);
+      this.satellit = new Satellite(this.map);
+
+    } else {
+      source.setData(geojson);
+      this.front.set(geojson);
+      this.setTyphoon(geojson);
+    }
+  }
+
+  async fetchGeojson(url) {
     const res = await fetch(url, { mode: 'cors' });
     const geojson = await res.json();
-    //console.log(geojson);
 
     geojson.features.forEach((f, i) => {
       if (f.properties.type === 'isobar') {
@@ -49,16 +69,14 @@ export default class WeatherMapLayer {
         }
       }
     });
-    this.map.addSource('weathermap', {
-      type: 'geojson',
-      data: geojson
-    });
-
+    return geojson;
+  }
+  
+  addLayers(geojson) {
     this.addIsobar('2hPa', 0.75, [10, 5]);
     this.addIsobar('4hPa', 0.75);
     this.addIsobar('20hPa', 1.5);
 
-    
     this.front = new WeatherMapFront(this.map, geojson);
     this.map.addLayer({
       "id": "front",
@@ -81,8 +99,6 @@ export default class WeatherMapLayer {
    
     this.addSymbols();
     this.addTyphoons(geojson);
-    
-    this.satellit = new Satellite(this.map);
   }
 
   addIsobar(type, width, dash) {
@@ -163,15 +179,9 @@ export default class WeatherMapLayer {
   }
 
   addTyphoons(geojson) {
-    const typhoon = geojson.features.filter(f => 'typhoonClass' in f.properties)
-      .map(f => {
-        f.properties.pressure = f.properties.center.pressure;
-        f.properties.name = '台' + parseInt(f.properties.name.number.substr(2)) + '号';
-        return f;
-      });
     this.map.addSource('weathermap-ty', {
       type: 'geojson',
-      data: { type: 'FeatureCollection', features: typhoon }
+      data: this.typhoonGeojson(geojson)
     });
 
     this.map.addLayer({
@@ -209,7 +219,20 @@ export default class WeatherMapLayer {
       },
     });
   }
+  
+  setTyphoon(geojson) {
+    this.map.getSource('weathermap-ty').setData(this.typhoonGeojson(geojson));
+  };
 
+  typhoonGeojson(geojson) {
+    const typhoon = geojson.features.filter(f => 'typhoonClass' in f.properties)
+      .map(f => {
+        f.properties.pressure = f.properties.center.pressure;
+        f.properties.name = '台' + parseInt(f.properties.name.number.substr(2)) + '号';
+        return f;
+      });
+    return { type: 'FeatureCollection', features: typhoon };
+  }
 
   hover = (e) => {
     const features = this.map.queryRenderedFeatures(e.point, { layers: [this.layerId] });

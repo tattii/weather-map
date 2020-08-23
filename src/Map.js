@@ -30,7 +30,8 @@ export default class Map extends Component {
       center: [136.6, 35.5],
       hash: true,
       logoPosition: 'bottom-right',
-      attributionControl: false
+      attributionControl: false,
+      fadeDuration: 0,
     });
 
     this.map.on('load', () => {

@@ -12,11 +12,12 @@ export default class TimeButton extends Component {
 
   componentDidMount() {
     this.listener = window.addEventListener('keydown', (e) => {
-      console.log(e);
       if (e.key === 'ArrowLeft') {
         this.back();
+        return null;
       } else if (e.key === 'ArrowRight') {
         this.forward();
+        return null;
       }
     });
   }
@@ -32,8 +33,7 @@ export default class TimeButton extends Component {
         d.type = 'forecast';
         return d;
       });
-      this.list = data.analysis.reverse().concat(forecasts);
-      console.log(this.list);
+      this.list = data.analysis.slice().reverse().concat(forecasts);
       const datetime = this.datetime_str(data.analysis[0].datetime);
       this.setState({ index: data.analysis.length - 1, datetime });
     }
@@ -60,9 +60,11 @@ export default class TimeButton extends Component {
   }
 
   set(index) {
-    let datetime = this.datetime_str(this.list[index].datetime);
-    if (this.list[index].type == 'forecast') datetime += '(予想)';
+    const l = this.list[index];
+    let datetime = this.datetime_str(l.datetime);
+    if (l.type === 'forecast') datetime += '(予想)';
     this.setState({ index, datetime });
+    this.props.select(l.datetime, l.url, l.type);
   }
 
   datetime_str(datetime) {

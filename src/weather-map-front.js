@@ -7,16 +7,24 @@ export default class WeatherMapFront {
   }
 
   add(geojson) {
+    this.map.addSource('weathermap-front', {
+      type: 'geojson',
+      data: this.source(geojson)
+    });
+    this.addLayer();
+  }
+
+  set(geojson) {
+    this.map.getSource('weathermap-front').setData(this.source(geojson));
+  }
+
+  source(geojson) {
     const front = geojson.features.filter(f => f.properties.type && f.properties.type.includes('前線'));
     const split = front.reduce((features, f) => {
       return features.concat(this.split(f).features);
     }, []);
-    
-    this.map.addSource('weathermap-front', {
-      type: 'geojson',
-      data: turf.featureCollection(split)
-    });
-    this.addLayer();
+
+    return turf.featureCollection(split);
   }
 
   split(f) {

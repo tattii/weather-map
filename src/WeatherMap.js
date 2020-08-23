@@ -42,10 +42,13 @@ export default class Warning extends Component {
   }
 
   render() {
-    return <TimeButton data={this.state.data} />;
+    return <TimeButton
+      data={this.state.data}
+      select={this.select}
+    />;
   }
 
-  selectTime = (type, index) => {
-    console.log(type, index);
+  select = (datetime, url, type) => {
+    this.layer.set(datetime, url, type);
   }
 }
