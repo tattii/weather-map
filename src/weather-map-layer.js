@@ -32,7 +32,11 @@ export default class WeatherMapLayer {
   set(datetime, url, type) {
     this.addLayer(url);
 
-    // satellite
+    if (type === 'forecast') {
+      this.satellite.hide();
+    } else {
+      this.satellite.set(datetime);
+    }
   }
   
   async addLayer(url) {
@@ -45,7 +49,7 @@ export default class WeatherMapLayer {
         data: geojson
       });
       this.addLayers(geojson);
-      this.satellit = new Satellite(this.map);
+      this.satellite = new Satellite(this.map);
 
     } else {
       source.setData(geojson);
